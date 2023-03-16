@@ -1,0 +1,1307 @@
+import java.util.Scanner;
+import java.sql.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class student_teacher_data {
+    static Scanner call_scanner = new Scanner(System.in);
+    static String first_name,middle_name,last_name;
+    static String middle_name_FirstLetter;
+    static String coc_account_email;
+
+    static String last_first_middle_format;
+
+    static double Year_Divide_4,leap_year;
+    static int birth_year;
+    static String birth_month;
+    static boolean year_loop;
+    static int birth_day,Con_birth_year;
+    static String add_more_list;
+    static int ict_grade,pr_grade,philo_grade,fil_grade,pe_grade;
+    static String student_complete_name, student_complete_YearBirth , student_complete_name_ConvertUpperCase,student_ID;
+
+    static String student_duplicate_name,student_duplicate_name_ConvertUpperCase;
+
+    //Convert to String
+    static String ConStr_birth_year,ConStr_birth_day,coc_account_password ;
+
+    static String sql_String_Birth_Year,student_BirthMonthComplete,sql_String_Birth_Day;
+
+    static  String convert_BirthYearString,convert_BirthDayString;
+    static String student_BornMonth;
+    static  String tableName;
+    static String student_AddCompleteBirthDay;
+
+    static  String student_id;
+    static double total_average;
+    public static String input_RealName(Scanner call_scanner) {
+        while (true) {
+            first_name_loop:
+            while (true) {
+                System.out.print("Student First Name: ");
+                first_name = call_scanner.nextLine().toLowerCase().trim();
+                if (first_name.matches("[a-z \\s]+")) {
+                    String[] con_arr_first_name = {first_name};
+                    String first_name_FirstLetter = (con_arr_first_name[0].charAt(0)) + "";
+                    if (first_name_FirstLetter.matches("[a-z]")) {
+                        try {
+                            String first_name_SecondLetter = (con_arr_first_name[0].charAt(1)) + "";
+                            if (first_name_SecondLetter.matches("[a-z]")) {
+                                //middle_name_loop
+                                while (true){
+                                    System.out.println("If You Don't Have a Middle Name You Can Just Type None");
+                                    System.out.print("Student Middle Name: ");
+                                    middle_name = call_scanner.next().toLowerCase().trim();
+                                    call_scanner.nextLine();
+                                    if(middle_name.matches("[a-z]+") && middle_name.equals("none")){
+                                        //last_name_loop
+                                        while (true){
+                                            System.out.print("Student Last Name: ");
+                                            last_name = call_scanner.next().toLowerCase().trim();
+                                            call_scanner.nextLine();
+                                            if(last_name.matches("[a-z]+")){
+                                                coc_account_email = first_name_FirstLetter + first_name_SecondLetter + first_name_FirstLetter + first_name_SecondLetter + "." + last_name + ".coc@phinmaed.com";
+
+                                                last_first_middle_format = last_name +", " + first_name;
+                                                //student_birthday(call_scanner);
+                                                return coc_account_email;
+
+                                            }else{
+                                                System.out.println("Please Correctly Input Your Last Name.");
+                                            }
+                                        }
+                                    } else if (middle_name.matches("[a-z]+")) {
+                                        String[] con_arr_middle_name = {middle_name};
+                                        middle_name_FirstLetter = (con_arr_middle_name[0].charAt(0)) + "";
+                                        if(middle_name_FirstLetter.matches("[a-z]")){
+                                            try {
+                                                String middle_name_SecondLetter = (con_arr_middle_name[0].charAt(1)) + "";
+                                                //last_name_loop
+                                                while (true){
+                                                    System.out.print("Student Last Name: ");
+                                                    last_name = call_scanner.next().toLowerCase().trim();
+                                                    call_scanner.nextLine();
+                                                    if(last_name.matches("[a-z]+")){
+
+                                                        coc_account_email = first_name_FirstLetter + first_name_SecondLetter + middle_name_FirstLetter + middle_name_SecondLetter + "." + last_name + ".coc@phinmaed.com";
+                                                        last_first_middle_format = last_name + ", " + first_name + " " + middle_name;
+                                                        //student_birthday(call_scanner);
+
+                                                        return coc_account_email;
+
+                                                    }else{
+                                                        System.out.println("Please Correctly Input Your Last Name.");
+                                                    }
+                                                }
+                                            }catch (StringIndexOutOfBoundsException e){
+                                                System.out.println("Please Correctly Input Your Middle Name.");
+                                            }
+                                        }
+                                    } else{
+                                        System.out.println("You inputted contain number(s) or special character(s)!Try again.");
+                                    }
+                                }
+                            }
+                        } catch (StringIndexOutOfBoundsException e) {
+                            System.out.println("Please Correctly Inputted Your First Name");
+                        }
+                    } else {
+                        System.out.println("You may be inputted contain number(s) or special character(s)!Try agains.");
+                        System.out.println();
+                        break first_name_loop;
+                    }
+                } else {
+                    System.out.println("You may be inputted contain number(s) or special character(s)!Try again.");
+
+                }
+            }
+        }
+    }
+    static void create_teacher_table(Scanner call_scanner){
+        System.out.print("\nLOG-IN AS A TEACHER");
+
+        try {
+            for(int teacher_log_in = 1;teacher_log_in <= 3; teacher_log_in++){
+                System.out.print(".");
+                Thread.sleep(1000);
+            }
+        }catch (Exception e){
+        }
+        while (true){
+            while (true){
+                System.out.print("\nCreate Account /Already have account[C/A]: ");
+                String teacher_choose = call_scanner.next().toLowerCase().trim();
+                call_scanner.nextLine();
+                if (teacher_choose.equals("c")){
+                    tableName = "";
+                    while (true){
+                        try {
+                            // Prompt the user to enter the table name
+                            System.out.print("Create Name: ");
+                            tableName = call_scanner.nextLine();
+                            System.out.print("Create Password: ");
+                            String teacher_create_pass = call_scanner.nextLine();
+                            String teacher_id = (ThreadLocalRandom.current().nextLong(100000000000L,999999999999L)) + "";
+
+                            // Connect to the database
+                            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+
+                            // Create the SQL query with placeholders for the table name and column names
+                            String sql = "CREATE TABLE `class_record_database`.`" + tableName + "` (" +
+                                    "`student_id` VARCHAR(50) NOT NULL," +
+                                    "`student_name` VARCHAR(45) NOT NULL," +
+                                    "`student_birthday` VARCHAR(45) NOT NULL," +
+                                    "`student_email` VARCHAR(45) NOT NULL," +
+                                    "`student_password` VARCHAR(45) NOT NULL," +
+                                    "`filipino_grade` INT NOT NULL," +
+                                    "`pr_grade` INT NOT NULL," +
+                                    "`philosophy_grade` INT NOT NULL," +
+                                    "`pe_grade` INT NOT NULL," +
+                                    "`ict_grade` INT NOT NULL," +
+                                    "`total_average` DOUBLE NOT NULL," +
+                                    "`Evaluation` VARCHAR(50) NOT NULL," +
+                                    "PRIMARY KEY (`student_id`)," +
+                                    "UNIQUE INDEX `student_id_UNIQUE` (`student_id` ASC) VISIBLE);";
+
+                            // Create the statement and execute the query
+                            Statement statement = connection.createStatement();
+                            statement.executeUpdate(sql);
+
+                            PreparedStatement insert_teacher_NamePass = connection.prepareStatement("INSERT INTO teacher_name_password (idteacher_name_password,teacher_name,teacher_password) VALUES(?,?,?)");
+
+                            insert_teacher_NamePass.setString(1,teacher_id);
+                            insert_teacher_NamePass.setString(2,tableName);
+                            insert_teacher_NamePass.setString(3,teacher_create_pass);
+                            insert_teacher_NamePass.executeUpdate();
+
+                            System.out.println("Account " + tableName + " created successfully.");
+
+                            all_command(call_scanner);
+
+                        } catch (Exception e) {
+                            if(e.getMessage().contains(tableName)){
+                                System.out.println("Account already exists.");
+                            }else{
+                                System.out.println("An error occurred while creating the account: " + e.getMessage());
+                            }
+                        }
+                    }
+
+                }else if (teacher_choose.equals("a")){
+                    try {
+                        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+                        System.out.print("Enter Name: ");
+                        tableName = call_scanner.nextLine();
+                        System.out.print("Enter Password: ");
+                        String teacher_password_enter = call_scanner.nextLine();
+
+                        String Have_account_login = "SELECT * FROM teacher_name_password WHERE teacher_name = ? AND teacher_password = ?";
+
+                        PreparedStatement checking_teacher_AND_password = connection.prepareStatement(Have_account_login);
+
+                        checking_teacher_AND_password.setString(1,tableName);
+                        checking_teacher_AND_password.setString(2,teacher_password_enter);
+
+                        ResultSet checking = checking_teacher_AND_password.executeQuery();
+
+                        if(checking.next()){
+                            all_command(call_scanner);
+                        }else{
+                            System.out.println("Access Denied");
+                        }
+                    }catch (Exception e){
+                        System.out.println("An error occurred while creating the table: " + e.getMessage());
+                    }
+                }else{
+                    System.out.println("\nInvalid choice. Please enter 'C' Create Account for  or 'A' for Already have account.");
+                    break;
+                }
+            }
+        }
+    }
+
+    static void class_record(){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+            Statement show_records = connection.createStatement();
+            ResultSet all_records = show_records.executeQuery("SELECT * FROM `"+ tableName +"` ");
+
+            if(!all_records.isBeforeFirst()){
+                System.out.println("\nClass Record Is Empty");
+            }else{
+                System.out.println("+===========+============+============================================================+====================+========================================+==========+==========+===================+============+====================+=====+==========+===============+");
+                System.out.println("│NO. STUDENT│ STUDENT ID │ STUDENT NAME                                               │      BIRTHDAY      │             EMAIL                      │ PASSWORD │ FILIPINO │ PRACTICAL RESEARCH| PHILOSOPHY | PHYSICAL EDUCATION | ICT |  AVERAGE |   EVALUATION  |");
+                System.out.println("+===========+============+============================================================+====================+========================================+==========+==========+===================+============+====================+=====+==========+===============+");
+                int count_record = 1;
+
+                while (all_records.next()) {
+                    System.out.printf("│%1$-11s│%2$-12s│%3$-60s│%4$-20s│%5$-40s│%6$-10s│%7$-10s│%8$-19s│%9$-12s│%10$-20s│%11$-5s│%12$-10s│%13$-15s│%n", count_record + ").", all_records.getString("student_id"), all_records.getString("student_name"), all_records.getString("student_birthday"), all_records.getString("student_email"), all_records.getString("student_password"), all_records.getInt("filipino_grade") + "", all_records.getInt("pr_grade") + "", all_records.getInt("philosophy_grade") + "", all_records.getInt("pe_grade") + "", all_records.getInt("ict_grade") + "",all_records.getInt("total_average") + "", all_records.getString("Evaluation"));
+                    count_record++;
+
+                }
+                System.out.println("+===========+============+============================================================+====================+========================================+==========+==========+===================+============+====================+=====+==========+===============+");            }
+
+        }catch (Exception e){
+            System.out.println("Error in Seeing Class Record");
+            e.printStackTrace();
+        }
+    }
+
+    static void student_login(Scanner call_scanner){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+
+            System.out.print("LOG-IN AS A STUDENT");
+            for(int student_log_in = 1;student_log_in <= 3; student_log_in++){
+                try {
+                    System.out.print(".");
+                    Thread.sleep(1000);
+                }catch (Exception e){
+
+                }
+            }
+            call_scanner.nextLine();
+            while (true){
+                while (true){
+                    PreparedStatement teacher_account_name = connection.prepareStatement("SELECT * FROM teacher_name_password WHERE teacher_name = ?");
+
+                    System.out.print("\nTeacher Account Name: ");
+                    tableName = call_scanner.nextLine();
+                    teacher_account_name.setString(1,tableName);
+
+                    ResultSet checking = teacher_account_name.executeQuery();
+
+                    if(checking.next()){
+                        PreparedStatement checking_EmailPassword = connection.prepareStatement("SELECT * FROM `"+tableName+"` WHERE student_email = ? AND student_password = ? ");
+
+                        System.out.print("Email: ");
+                        String student_email = call_scanner.nextLine().toLowerCase().trim();
+                        System.out.print("Password: ");
+                        String student_password = call_scanner.nextLine().toUpperCase().trim();
+                        checking_EmailPassword.setString(1,student_email);
+                        checking_EmailPassword.setString(2,student_password);
+
+                        ResultSet login_student = checking_EmailPassword.executeQuery();
+
+                        if(login_student.next()){
+                            System.out.println("\n\n+=====================================================================+=============================================================================+");
+                            System.out.printf("│%1$-147s│%n","STUDENT NAME: " + login_student.getString("student_name")    );
+                            System.out.printf("│%1$-147s│%n","STUDENT ID: " + login_student.getString("student_id"));
+                            System.out.printf("│%1$-147s│%n","TOTAL AVERAGE: " + login_student.getDouble("total_average"));
+                            System.out.printf("│%1$-147s│%n","EVALUATION: " + login_student.getString("Evaluation"));
+
+                            int app_003 = login_student.getInt("filipino_grade");
+                            int app_006 = login_student.getInt("pr_grade");
+                            int cor_015 = login_student.getInt("philosophy_grade");
+                            int cor_019 = login_student.getInt("pe_grade");
+                            int ict_001 = login_student.getInt("ict_grade");
+
+                            System.out.println("│==============+================================================+==============================+======+=====================+=============+=========+");
+                            System.out.println("│              │                                                │                              │      │                     │             │         │");
+                            System.out.println("│ Subject Code │                 Description                    │         Faculty Name         │ Unit │       Section       │ 1st Quarter │ Remarks │");
+                            System.out.println("│              │                                                │                              │      │                     │             │         │");
+                            System.out.println("│--------------+------------------------------------------------+------------------------------+------+---------------------+-------------+---------+");
+                            if(app_003 == 100){
+                                System.out.println("│    APP 003   │ FILIPINO SA PILING LARANGAN                    │ ZAPANTA, FRANCISCO III E.    │   4  │ COC-FB1-G12-01-PROG │     " +  app_003 + "     │ PASSED  │");
+
+                            } else if (app_003 >= 75 ) {
+                                System.out.println("│    APP 003   │ FILIPINO SA PILING LARANGAN                    │ ZAPANTA, FRANCISCO III E.    │   4  │ COC-FB1-G12-01-PROG │      " +  app_003 + "     │ PASSED  │");
+                            } else{
+                                System.out.println("│    APP 003   │ FILIPINO SA PILING LARANGAN                    │ ZAPANTA, FRANCISCO III E.    │   4  │ COC-FB1-G12-01-PROG │      " + app_003 + "     │ FAILED  │");
+                            }
+
+                            if(app_006 == 100){
+                                System.out.println("│    APP 006   │ PRACTICAL RESEARCH 2                           │ BAHAN, ROSELYN -             │   4  │ COC-FB1-G12-01-PROG │     " + app_006 + "     │ PASSED  │");
+                            } else if (app_006 >= 75) {
+                                System.out.println("│    APP 006   │ PRACTICAL RESEARCH 2                           │ BAHAN, ROSELYN -             │   4  │ COC-FB1-G12-01-PROG │      " + app_006 + "     │ PASSED  │");
+                            } else{
+                                System.out.println("│    APP 006   │ PRACTICAL RESEARCH 2                           │ BAHAN, ROSELYN -             │   4  │ COC-FB1-G12-01-PROG │      " + app_006 + "     │ FAILED  │");
+                            }
+
+                            if(cor_015 == 100){
+                                System.out.println("│    COR 015   │ INTRODUCTION TO PHILOSOPHY OF THE HUMAN PERSON │ MIÑOZA, MARK ANTHONY TENEBRO │   4  │ COC-FB1-G12-01-PROG │     " + cor_015 + "     │ PASSED  │");
+                            } else if (cor_015 >= 75) {
+                                System.out.println("│    COR 015   │ INTRODUCTION TO PHILOSOPHY OF THE HUMAN PERSON │ MIÑOZA, MARK ANTHONY TENEBRO │   4  │ COC-FB1-G12-01-PROG │      " + cor_015 + "     │ PASSED  │");
+                            } else{
+                                System.out.println("│    COR 015   │ INTRODUCTION TO PHILOSOPHY OF THE HUMAN PERSON │ MIÑOZA, MARK ANTHONY TENEBRO │   4  │ COC-FB1-G12-01-PROG │      " + cor_015 + "     │ FAILED  │");
+                            }
+
+                            if(cor_019 == 100){
+                                System.out.println("│    COR 019   │ PHYSICAL EDUCATION AND HEALTH 3                │ ATLAWAN, DEXTER REY D.       │   4  │ COC-FB1-G12-01-PROG │     " + cor_019 + "     │ PASSED  │");
+                            }
+                            else if(cor_019 >= 75){
+                                System.out.println("│    COR 019   │ PHYSICAL EDUCATION AND HEALTH 3                │ ATLAWAN, DEXTER REY D.       │   4  │ COC-FB1-G12-01-PROG │      " + cor_019 + "     │ PASSED  │");
+                            }else{
+                                System.out.println("│    COR 019   │ PHYSICAL EDUCATION AND HEALTH 3                │ ATLAWAN, DEXTER REY D.       │   4  │ COC-FB1-G12-01-PROG │      " + cor_019 + "     │ FAILED  │");
+                            }
+
+                            if (ict_001 == 100){
+                                System.out.println("│    ICT 001   │ COMPUTER PROGRAMMING (NC III)                  │ BAGUIO, RALPH ANGELO E.      │   4  │ COC-FB1-G12-01-PROG │     " + ict_001 + "     │ PASSED  │");
+                            }
+                            else if(ict_001 >= 75){
+                                System.out.println("│    ICT 001   │ COMPUTER PROGRAMMING (NC III)                  │ BAGUIO, RALPH ANGELO E.      │   4  │ COC-FB1-G12-01-PROG │      " + ict_001 + "     │ PASSED  │");
+                            }else{
+                                System.out.println("│    ICT 001   │ COMPUTER PROGRAMMING (NC III)                  │ BAGUIO, RALPH ANGELO E.      │   4  │ COC-FB1-G12-01-PROG │      " + ict_001 + "     │ FAILED  │");
+                            }
+                            System.out.println("│              │                                                │                              │      │                     │             │         │");
+                            System.out.println("│______________│________________________________________________│______________________________│______│_____________________│_____________│_________│ " );
+
+                            do{
+                                System.out.print("TYPE S to Stop the Program And L to Log-out: ");
+                                String stop_program = call_scanner.nextLine().toLowerCase().trim();
+
+                                if(stop_program.equals("s")){
+
+                                    System.exit(0);
+
+                                }else if(stop_program.equals("l")){
+
+                                    System.out.println("Log Out");
+                                    break;
+
+                                }else{
+                                    System.out.println("Invalid Keyword");
+                                }
+                            }while(true);
+
+                        }else{
+                            System.out.println("Wrong Email And Password");
+                        }
+
+                    }else{
+                        System.out.println("Teacher Account Name Not Found In Records.");
+                    }
+                }
+            }
+
+        }catch (Exception e){
+
+        }
+    }
+
+    static void all_command(Scanner call_scanner){
+        boolean command;
+        while (true){
+            try {
+                command = false;
+                System.out.println("\n\n");
+                System.out.println("+----------------------------+");
+                System.out.println("│        CHOOSE COMMAND      │");
+                System.out.println("+----------------------------+");
+                System.out.println("│[1] - Add Student Record    │");
+                System.out.println("│[2] - Delete Student Record │");
+                System.out.println("│[3] - Update Student Record │");
+                System.out.println("│[4] - Show Student Record   │");
+                System.out.println("+----------------------------+");
+                System.out.print("Choose Command : ");
+                int choose_command_teacher = call_scanner.nextInt();
+                call_scanner.nextLine();
+
+                if(choose_command_teacher == 1){
+                    String return_student_completeName = input_RealName(call_scanner);
+                    do {
+                        try {
+                            year_loop = false;
+                            year_loop:
+                            while (true) {
+                                System.out.print("\nBirth Year:");
+                                birth_year = call_scanner.nextInt();
+                                call_scanner.nextLine();
+                                if (birth_year >= 2000 && birth_year <= 2006) {
+                                    Year_Divide_4 = birth_year / 4;
+                                    int Convert_YeDi4_int = (int) Year_Divide_4;
+                                    leap_year = Year_Divide_4 - Convert_YeDi4_int;
+                                    if (leap_year == 0) {
+                                        //Month
+                                        month_loop:
+                                        while (true) {
+
+                                            System.out.println("Abbreviation Of Month Or Whole Name Of Month");
+                                            System.out.println("Ex. January ---> Jan/January");
+                                            System.out.print("Month:");
+
+                                            birth_month = call_scanner.nextLine().toLowerCase().trim();
+                                            if (birth_month.matches("[a-z]+") && birth_month.equals("jan") || birth_month.equals("january") || birth_month.equals("mar") || birth_month.equals("march") || birth_month.equals("may") || birth_month.equals("jul") || birth_month.equals("july") || birth_month.equals("aug") || birth_month.equals("august") || birth_month.equals("oct") || birth_month.equals("october") || birth_month.equals("dec") || birth_month.equals("december")) {
+                                                String return_coc_account_password = Months_31_days_function(call_scanner);
+                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                Double return_total_average = student_subject_grade();
+                                                String return_student_BirthBorn = student_BirthDayComplete();
+                                                add_Student_record();
+
+                                                boolean command_bool;
+                                                while (true){
+                                                    try {
+                                                        command_bool = false;
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│        CHOOSE COMMAND      │");
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│[1] - Add Student Record    │");
+                                                        System.out.println("│[5] - Return                │");
+                                                        System.out.println("+----------------------------+");
+
+                                                        System.out.print("Choose Command: ");
+                                                        int command_choose = call_scanner.nextInt();
+                                                        call_scanner.nextLine();
+                                                        if(command_choose == 1){
+                                                            System.out.println("Adding more Student");
+                                                            String return_AddMore_student = input_RealName(call_scanner);
+                                                            break month_loop;
+
+                                                        } else if (command_choose == 5) {
+                                                            break year_loop;
+                                                        }else{
+                                                            System.out.println("Invalid Command");
+                                                        }
+
+                                                    }catch (Exception e){
+                                                        command_bool = true;
+                                                        System.out.println("Invalid Command");
+                                                        call_scanner.next();
+                                                    }
+                                                }
+                                            } else if (birth_month.matches("[a-z]+") && birth_month.equals("nov") || birth_month.equals("november") || birth_month.equals("sep") || birth_month.equals("september") || birth_month.equals("jun") || birth_month.equals("june") || birth_month.equals("apr") || birth_month.equals("april")) {
+                                                String return_coc_account_password = Months_30_days_function(call_scanner);
+                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                Double return_total_average = student_subject_grade();
+                                                String return_student_BirthBorn = student_BirthDayComplete();
+                                                add_Student_record();
+
+                                                boolean command_bool;
+                                                while (true){
+                                                    try {
+                                                        command_bool = false;
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│        CHOOSE COMMAND      │");
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│[1] - Add Student Record    │");
+                                                        System.out.println("│[5] - Return                │");
+                                                        System.out.println("+----------------------------+");
+
+                                                        System.out.print("Choose Command: ");
+                                                        int command_choose = call_scanner.nextInt();
+                                                        call_scanner.nextLine();
+                                                        if(command_choose == 1){
+                                                            System.out.println("Adding more Student");
+                                                            String return_AddMore_student = input_RealName(call_scanner);
+                                                            break month_loop;
+
+                                                        } else if (command_choose == 5) {
+                                                            break year_loop;
+                                                        }else{
+                                                            System.out.println("Invalid Command");
+                                                        }
+
+                                                    }catch (Exception e){
+                                                        command_bool = true;
+                                                        System.out.println("Invalid Command");
+                                                        call_scanner.next();
+                                                    }
+                                                }
+
+                                            } else if (birth_year == 2000 && birth_month.equals("feb") || birth_month.equals("february") || birth_year == 2004 && birth_month.equals("feb") || birth_month.equals("february")) {
+                                                String return_coc_account_password = february_LeapYear_function(call_scanner);
+                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                Double return_total_average = student_subject_grade();
+                                                String return_student_BirthBorn = student_BirthDayComplete();
+                                                add_Student_record();
+
+                                                boolean command_bool;
+                                                while (true){
+                                                    try {
+                                                        command_bool = false;
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│        CHOOSE COMMAND      │");
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│[1] - Add Student Record    │");
+                                                        System.out.println("│[5] - Return                │");
+                                                        System.out.println("+----------------------------+");
+
+                                                        System.out.print("Choose Command: ");
+                                                        int command_choose = call_scanner.nextInt();
+                                                        call_scanner.nextLine();
+                                                        if(command_choose == 1){
+                                                            System.out.println("Adding more Student");
+                                                            String return_AddMore_student = input_RealName(call_scanner);
+                                                            break month_loop;
+
+                                                        } else if (command_choose == 5) {
+                                                            break year_loop;
+                                                        }else{
+                                                            System.out.println("Invalid Command");
+                                                        }
+
+                                                    }catch (Exception e){
+                                                        command_bool = true;
+                                                        System.out.println("Invalid Command");
+                                                        call_scanner.next();
+                                                    }
+                                                }
+
+                                            } else if (birth_month.equals("feb") || birth_month.equals("february")) {
+                                                String return_coc_account_password = february_NotLeapYear_function(call_scanner);
+                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                Double return_total_average = student_subject_grade();
+                                                String return_student_BirthBorn = student_BirthDayComplete();
+                                                add_Student_record();
+
+                                                boolean command_bool;
+                                                while (true){
+                                                    try {
+                                                        command_bool = false;
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│        CHOOSE COMMAND      │");
+                                                        System.out.println("+----------------------------+");
+                                                        System.out.println("│[1] - Add Student Record    │");
+                                                        System.out.println("│[5] - Return                │");
+                                                        System.out.println("+----------------------------+");
+
+                                                        System.out.print("Choose Command: ");
+                                                        int command_choose = call_scanner.nextInt();
+                                                        call_scanner.nextLine();
+                                                        if(command_choose == 1){
+                                                            System.out.println("Adding more Student");
+                                                            String return_AddMore_student = input_RealName(call_scanner);
+                                                            break month_loop;
+
+                                                        } else if (command_choose == 5) {
+                                                            break year_loop;
+                                                        }else{
+                                                            System.out.println("Invalid Command");
+                                                        }
+
+                                                    }catch (Exception e){
+                                                        command_bool = true;
+                                                        System.out.println("Invalid Command");
+                                                        call_scanner.next();
+                                                    }
+                                                }
+
+                                            } else {
+                                                System.out.println("Invalid Months");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    System.out.println("Invalid Year");
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            year_loop = true;
+                            System.out.println("Invalid Year");
+                            call_scanner.next();
+                        }
+                    } while (year_loop);
+
+                } else if (choose_command_teacher == 2) {
+                    //Delete Student Record
+                    delete_student_record(call_scanner);
+                } else if (choose_command_teacher == 3) {
+                    //Update Student Record
+                    update_student_record(call_scanner);
+                } else if (choose_command_teacher == 4) {
+                    //Class Record
+                    class_record();
+                }else{
+                    System.out.println("Invalid Command.");
+                }
+
+            }catch (Exception e){
+                command = true;
+                System.out.println("Invalid Command.");
+                call_scanner.next();
+            }
+        }
+    }
+
+
+
+
+    static void delete_student_record(Scanner call_scanner){
+        Delete_loop:
+        while (true){
+            try {
+                class_record();
+                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+                Statement database_empty_value = connection.createStatement();
+                ResultSet delete_student = database_empty_value.executeQuery("SELECT * FROM `"+tableName+"` ");
+
+                if(!delete_student.isBeforeFirst()){
+                    System.out.println("Class Record Is Empty! You Can't Use Delete Command.");
+                    break;
+                }else{
+                    PreparedStatement delete_student_record = connection.prepareStatement("DELETE FROM `"+tableName+"` WHERE student_id = ?");
+                    System.out.print("Enter Student ID: ");
+                    String student_id_delete = call_scanner.next();
+                    call_scanner.nextLine();
+
+                    delete_student_record.setString(1,student_id_delete);
+                    int delete_message = delete_student_record.executeUpdate();
+                    if(delete_message > 0){
+                        System.out.println("Student Successfully Deleted In Class Record");
+                        class_record();
+                        while (true){
+                            System.out.println("+----------------------------+");
+                            System.out.println("│        CHOOSE COMMAND      │");
+                            System.out.println("+----------------------------+");
+                            System.out.println("│[T] - Try Again             │");
+                            System.out.println("│[B] - Back                  │");
+                            System.out.println("+----------------------------+");
+                            System.out.print("Choose Command: ");
+                            String try_again_delete = call_scanner.nextLine().toLowerCase().trim();
+                            if(try_again_delete.equals("t")){
+                                break;
+                            } else if (try_again_delete.equals("b")) {
+                                break Delete_loop;
+                            }else{
+                                System.out.println("Invalid Command");
+                            }
+                        }
+                    }else{
+                        System.out.println("Student ID: " + student_id_delete + " not found.");
+                        while (true){
+                            System.out.println("+----------------------------+");
+                            System.out.println("│        CHOOSE COMMAND      │");
+                            System.out.println("+----------------------------+");
+                            System.out.println("│[T] - Try Again             │");
+                            System.out.println("│[B] - Back                  │");
+                            System.out.println("+----------------------------+");
+                            System.out.print("Choose Command: ");
+                            String try_again_delete = call_scanner.nextLine().toLowerCase().trim();
+                            if(try_again_delete.equals("t")){
+                                break;
+                            } else if (try_again_delete.equals("b")) {
+                                break Delete_loop;
+                            }else{
+                                System.out.println("Invalid Command");
+                            }
+                        }
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    static void add_Student_record(){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+            PreparedStatement existing_account = connection.prepareStatement("SELECT * FROM `"+tableName+"` WHERE student_email = ? AND student_password = ?");
+
+            existing_account.setString(1,coc_account_email);
+            existing_account.setString(2,coc_account_password);
+
+            ResultSet existingEmailPassword = existing_account.executeQuery();
+
+            if (existingEmailPassword.next()){
+                System.out.println("Student Already Taken Email And Password");
+            }else {
+                PreparedStatement insert_StudentClassRecord = connection.prepareStatement("INSERT INTO `" + tableName + "`(student_id,student_name,student_birthday,student_email,student_password,filipino_grade,pr_grade,philosophy_grade,pe_grade,ict_grade,total_average,Evaluation) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+
+                student_id = (ThreadLocalRandom.current().nextLong(100000000000L,999999999999L)) + "";
+
+                String Convert_Name_LetterWillBig = last_first_middle_format.toUpperCase();
+                insert_StudentClassRecord.setString(1,student_id);
+                insert_StudentClassRecord.setString(2,Convert_Name_LetterWillBig);
+                insert_StudentClassRecord.setString(3,student_AddCompleteBirthDay);
+                insert_StudentClassRecord.setString(4,coc_account_email);
+                insert_StudentClassRecord.setString(5,coc_account_password);
+                insert_StudentClassRecord.setInt(6,fil_grade);
+                insert_StudentClassRecord.setInt(7, pr_grade);
+                insert_StudentClassRecord.setInt(8, philo_grade);
+                insert_StudentClassRecord.setInt(9, pe_grade);
+                insert_StudentClassRecord.setInt(10, ict_grade);
+                insert_StudentClassRecord.setDouble(11,total_average);
+
+                if(total_average <= 74){
+                    insert_StudentClassRecord.setString(12,"Failed");
+                    int rowAffected = insert_StudentClassRecord.executeUpdate();
+                    if (rowAffected > 0) {
+                        System.out.println( Convert_Name_LetterWillBig +" Successfully Added In Class Record");
+                        class_record();
+                    } else {
+                        System.out.println("Their no new data Added");
+                    }
+                }else{
+                    insert_StudentClassRecord.setString(12,"Passed");
+                    int rowAffected = insert_StudentClassRecord.executeUpdate();
+                    if (rowAffected > 0) {
+                        System.out.println(Convert_Name_LetterWillBig + " Successfully Added In Class Record");
+                        class_record();
+                    } else {
+                        System.out.println("Their no new data Added");
+                    }
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    static void update_student_record(Scanner call_scanner){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/class_record_database", "root", "topitagupa09155524404");
+
+            update_loop_first:
+            while (true){
+                Statement database_empty_value = connection.createStatement();
+                ResultSet update_student = database_empty_value.executeQuery("SELECT * FROM `"+tableName+"` ");
+
+                if(!update_student.isBeforeFirst()){
+                    System.out.println("Class Record Is Empty! You Can't Use Update Command.");
+                    break;
+                }else{
+                    while (true){
+                        Update_loop:
+                        while (true){
+                            class_record();
+                            System.out.println("+----------------------------+");
+                            System.out.println("│        CHOOSE COMMAND      │");
+                            System.out.println("+----------------------------+");
+                            System.out.println("│[N] - Change Student Name   │");
+                            System.out.println("│[G] - Change Student Grade  │");
+                            System.out.println("│[D] - Change Birth Day      │");
+                            System.out.println("│[B] - Back                  │");
+                            System.out.println("+----------------------------+");
+                            System.out.print("COMMAND: ");
+                            String update_student_record = call_scanner.next().toLowerCase().trim();
+                            call_scanner.nextLine();
+                            if(update_student_record.equals("n")){
+
+                                while (true){
+                                    class_record();
+                                    System.out.print("Enter Student ID: ");
+                                    String student_ID = call_scanner.nextLine();
+                                    PreparedStatement check_student_id_update = connection.prepareStatement("SELECT * FROM `"+tableName+"` WHERE student_id = ? ");
+                                    check_student_id_update.setString(1,student_ID);
+
+                                    ResultSet student_ID_update = check_student_id_update.executeQuery();
+
+                                    if(!student_ID_update.next()){
+                                        System.out.println("Student ID Is Not Found Class Record.");
+                                        break;
+                                    }else{
+                                        PreparedStatement update_student_record_name = connection.prepareStatement("UPDATE `"+tableName+"` SET student_name = ?,student_email = ?, student_password = ?  WHERE student_id = ?");
+                                        input_RealName(call_scanner);
+                                        String convert_StudentNameUpdate = last_first_middle_format.toUpperCase();
+                                        update_student_record_name.setString(1,convert_StudentNameUpdate);
+                                        update_student_record_name.setString(2,coc_account_email);
+                                        update_student_record_name.setString(3,coc_account_password);
+                                        update_student_record_name.setString(4,student_ID);
+
+                                        update_student_record_name.executeUpdate();
+
+                                    }
+                                }
+
+                            } else if (update_student_record.equals("g")) {
+                                while (true){
+                                    class_record();
+                                    System.out.print("Enter Student ID: ");
+                                    String student_ID = call_scanner.nextLine();
+                                    PreparedStatement check_student_id_update = connection.prepareStatement("SELECT * FROM `"+tableName+"` WHERE student_id = ? ");
+                                    check_student_id_update.setString(1,student_ID);
+
+                                    ResultSet student_ID_update = check_student_id_update.executeQuery();
+
+                                    if(!student_ID_update.next()){
+                                        System.out.println("Student ID Is Not Found Class Record.");
+                                        break;
+                                    }else{
+                                        PreparedStatement update_student_record_grade = connection.prepareStatement("UPDATE `"+tableName+"` SET filipino_grade = ?,pr_grade = ?, philosophy_grade = ?, pe_grade = ?, ict_grade = ?, total_average = ?, Evaluation = ? WHERE student_id = ?");
+                                        student_subject_grade();
+
+                                        update_student_record_grade.setInt(1,fil_grade);
+                                        update_student_record_grade.setInt(2, pr_grade);
+                                        update_student_record_grade.setInt(3, philo_grade);
+                                        update_student_record_grade.setInt(4, pe_grade);
+                                        update_student_record_grade.setInt(5, ict_grade);
+                                        update_student_record_grade.setDouble(6,total_average);
+                                        if(total_average > 74){
+                                            update_student_record_grade.setString(7,"Passed");
+                                            update_student_record_grade.setString(8,student_ID);
+                                            update_student_record_grade.executeUpdate();
+                                        } else if (total_average <=74) {
+                                            update_student_record_grade.setString(7,"Failed");
+                                            update_student_record_grade.setString(8,student_ID);
+                                            update_student_record_grade.executeUpdate();
+                                        }
+                                    }
+
+                                }
+                            } else if (update_student_record.equals("d")) {
+                                class_record();
+                                System.out.print("Enter Student ID: ");
+                                String student_ID = call_scanner.nextLine();
+                                PreparedStatement check_student_id_update = connection.prepareStatement("SELECT * FROM `"+tableName+"` WHERE student_id = ? ");
+                                check_student_id_update.setString(1,student_ID);
+
+                                ResultSet student_ID_update = check_student_id_update.executeQuery();
+
+                                if(!student_ID_update.next()){
+                                    System.out.println("Student ID Is Not Found Class Record.");
+                                    break;
+                                }else{
+                                    PreparedStatement update_student_record_birthday = connection.prepareStatement("UPDATE `"+tableName+"` SET student_birthday = ?, student_password = ? WHERE student_id = ?");
+
+                                    do {
+                                        try {
+                                            year_loop = false;
+                                            year_loop:
+                                            while (true) {
+                                                System.out.print("\nBirth Year:");
+                                                birth_year = call_scanner.nextInt();
+                                                call_scanner.nextLine();
+                                                if (birth_year >= 2000 && birth_year <= 2006) {
+                                                    Year_Divide_4 = birth_year / 4;
+                                                    int Convert_YeDi4_int = (int) Year_Divide_4;
+                                                    leap_year = Year_Divide_4 - Convert_YeDi4_int;
+                                                    if (leap_year == 0) {
+                                                        //Month
+                                                        month_loop:
+                                                        while (true) {
+
+                                                            System.out.println("Abbreviation Of Month Or Whole Name Of Month");
+                                                            System.out.println("Ex. January ---> Jan/January");
+                                                            System.out.print("Month:");
+
+                                                            birth_month = call_scanner.nextLine().toLowerCase().trim();
+                                                            if (birth_month.matches("[a-z]+") && birth_month.equals("jan") || birth_month.equals("january") || birth_month.equals("mar") || birth_month.equals("march") || birth_month.equals("may") || birth_month.equals("jul") || birth_month.equals("july") || birth_month.equals("aug") || birth_month.equals("august") || birth_month.equals("oct") || birth_month.equals("october") || birth_month.equals("dec") || birth_month.equals("december")) {
+                                                                String return_coc_account_password = Months_31_days_function(call_scanner);
+                                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                                String return_student_BirthBorn = student_BirthDayComplete();
+
+                                                                update_student_record_birthday.setString(1,student_AddCompleteBirthDay);
+                                                                update_student_record_birthday.setString(2,coc_account_password);
+                                                                update_student_record_birthday.setString(3,student_ID);
+
+                                                                int update_birthday = update_student_record_birthday.executeUpdate();
+                                                                if (update_birthday > 0) {
+                                                                    System.out.println("Successfully Updated");
+                                                                    class_record();
+                                                                    break Update_loop;
+                                                                }
+
+                                                            } else if (birth_month.matches("[a-z]+") && birth_month.equals("nov") || birth_month.equals("november") || birth_month.equals("sep") || birth_month.equals("september") || birth_month.equals("jun") || birth_month.equals("june") || birth_month.equals("apr") || birth_month.equals("april")) {
+                                                                String return_coc_account_password = Months_30_days_function(call_scanner);
+                                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                                String return_student_BirthBorn = student_BirthDayComplete();
+
+                                                                update_student_record_birthday.setString(1,student_AddCompleteBirthDay);
+                                                                update_student_record_birthday.setString(2,coc_account_password);
+                                                                update_student_record_birthday.setString(3,student_ID);
+
+                                                                int update_birthday = update_student_record_birthday.executeUpdate();
+                                                                if (update_birthday > 0) {
+                                                                    System.out.println("Successfully Updated");
+                                                                    class_record();
+                                                                    break Update_loop;
+                                                                }
+
+
+                                                            } else if (birth_year == 2000 && birth_month.equals("feb") || birth_month.equals("february") || birth_year == 2004 && birth_month.equals("feb") || birth_month.equals("february")) {
+                                                                String return_coc_account_password = february_LeapYear_function(call_scanner);
+                                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                                String return_student_BirthBorn = student_BirthDayComplete();
+
+                                                                update_student_record_birthday.setString(1,student_AddCompleteBirthDay);
+                                                                update_student_record_birthday.setString(2,coc_account_password);
+                                                                update_student_record_birthday.setString(3,student_ID);
+
+                                                                int update_birthday = update_student_record_birthday.executeUpdate();
+                                                                if (update_birthday > 0) {
+                                                                    System.out.println("Successfully Updated");
+                                                                    class_record();
+                                                                    break Update_loop;
+                                                                }
+
+                                                            } else if (birth_month.equals("feb") || birth_month.equals("february")) {
+                                                                String return_coc_account_password = february_LeapYear_function(call_scanner);
+                                                                String return_student_BornMonth = Student_BornMonthFunction(call_scanner);
+                                                                String return_student_BirthBorn = student_BirthDayComplete();
+
+                                                                update_student_record_birthday.setString(1,student_AddCompleteBirthDay);
+                                                                update_student_record_birthday.setString(2,coc_account_password);
+                                                                update_student_record_birthday.setString(3,student_ID);
+
+                                                                int update_birthday = update_student_record_birthday.executeUpdate();
+                                                                if (update_birthday > 0) {
+                                                                    System.out.println("Successfully Updated");
+                                                                    class_record();
+                                                                    break Update_loop;
+                                                                }
+
+                                                            } else {
+                                                                System.out.println("Invalid Months");
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    System.out.println("Invalid Year");
+                                                }
+                                            }
+
+                                        } catch (Exception e) {
+                                            year_loop = true;
+                                            System.out.println("Invalid Year");
+                                            call_scanner.next();
+                                        }
+                                    } while (year_loop);
+                                }
+
+                            } else if (update_student_record.equals("b")) {
+                                break update_loop_first;
+                            } else {
+                                System.out.println("Invalid Command.");
+                            }
+                        }
+                    }
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    static int filipino_grade(Scanner call_scanner){
+        boolean filipino;
+        while (true){
+            try {
+                filipino = false;
+                System.out.print("Enter Filipino Grade: ");
+                fil_grade = call_scanner.nextInt();
+                if(fil_grade >= 101){
+                    System.out.println("Invalid Grade Input");
+                } else if (fil_grade <= 69) {
+                    System.out.println("Invalid Grade Input");
+                }else{
+                    return fil_grade;
+                }
+
+            }catch (Exception e){
+                filipino = true;
+                System.out.println("Invalid Grade Input");
+                call_scanner.next();
+            }
+        }
+    }
+
+    static int practical_research_grade(Scanner call_scanner){
+        boolean practical_research;
+        while (true){
+            try {
+                practical_research = false;
+                System.out.print("Enter Practical Research Grade: ");
+                pr_grade = call_scanner.nextInt();
+
+                if(pr_grade >= 101){
+                    System.out.println("Invalid Grade Input");
+                } else if (pr_grade <= 69) {
+                    System.out.println("Invalid Grade Input");
+                }else {
+                    return pr_grade;
+                }
+
+            }catch (Exception e){
+                practical_research = true;
+                System.out.println("Invalid Grade Input");
+                call_scanner.next();
+            }
+        }
+    }
+
+    static int philosophy_grade(Scanner call_scanner){
+        boolean philosophy;
+        while (true){
+            try {
+                philosophy = false;
+                System.out.print("Enter Philosophy Grade: ");
+                philo_grade = call_scanner.nextInt();
+
+                if(philo_grade >= 101){
+                    System.out.println("Invalid Grade Input");
+                } else if (philo_grade <= 69) {
+                    System.out.println("Invalid Grade Input");
+                }else {
+                    return philo_grade;
+                }
+
+            }catch (Exception e){
+                philosophy = true;
+                System.out.println("Invalid Grade Input");
+                call_scanner.next();
+            }
+        }
+    }
+
+    static int physical_education_grade(Scanner call_scanner){
+        boolean physical_education;
+        while (true){
+            try {
+                physical_education = false;
+
+                System.out.print("Enter Physical Education Grade: ");
+                pe_grade = call_scanner.nextInt();
+
+                if(pe_grade >= 101){
+                    System.out.println("Invalid Grade Input");
+                } else if (pe_grade <= 69 ) {
+                    System.out.println("Invalid Grade Input");
+                }else{
+                    return pe_grade;
+                }
+
+            }catch (Exception e){
+                physical_education = true;
+                System.out.println("Invalid Grade Input");
+                call_scanner.next();
+            }
+        }
+    }
+
+    static int ict_grade(Scanner call_scanner){
+        boolean ict;
+        while (true){
+            try {
+                ict = false;
+                System.out.print("Enter Ict Grade: ");
+                ict_grade = call_scanner.nextInt();
+                call_scanner.nextLine();
+
+                if (ict_grade >= 101){
+                    System.out.println("Invalid Grade Input");
+
+                } else if (ict_grade <= 69) {
+                    System.out.println("Invalid Grade Input");
+
+                }else{
+                    return ict_grade;
+                }
+
+            }catch (Exception e){
+                ict = true;
+                System.out.println("Invalid Grade Input");
+                call_scanner.next();
+            }
+        }
+    }
+
+    static double student_subject_grade(){
+        int return_filipino_grade = filipino_grade(call_scanner);
+        int return_practical_research = practical_research_grade(call_scanner);
+        int return_philosophy_grade = philosophy_grade(call_scanner);
+        int return_physical_education_grade = physical_education_grade(call_scanner);
+        int return_ict_grade = ict_grade(call_scanner);
+        int total_grade = return_filipino_grade + return_practical_research + return_philosophy_grade + return_physical_education_grade + return_ict_grade;
+        total_average = total_grade / 5.0;
+        System.out.println();
+        return total_average;
+
+    }
+
+    static String Student_BornMonthFunction(Scanner call_scanner){
+        if(birth_month.equals("jan") || birth_month.equals("january")){
+            student_BirthMonthComplete = "JANUARY";
+
+        }else if(birth_month.equals("feb") || birth_month.equals("february")){
+            student_BirthMonthComplete = "FEBRUARY";
+
+        }else if(birth_month.equals("mar") || birth_month.equals("march")){
+            student_BirthMonthComplete = "MARCH";
+
+        }else if(birth_month.equals("apr") || birth_month.equals("april")){
+            student_BirthMonthComplete = "APRIL";
+
+        }else if(birth_month.equals("may")){
+            student_BirthMonthComplete = "MAY";
+
+        }else if(birth_month.equals("jun") || birth_month.equals("june")){
+            student_BirthMonthComplete = "JUNE";
+
+        }else if(birth_month.equals("jul") || birth_month.equals("july")){
+            student_BirthMonthComplete = "JULY";
+
+        }else if(birth_month.equals("aug") || birth_month.equals("august")){
+            student_BirthMonthComplete = "AUGUST";
+
+        }else if(birth_month.equals("sep") || birth_month.equals("september")){
+            student_BirthMonthComplete = "SEPTEMBER";
+
+        }else if(birth_month.equals("oct") || birth_month.equals("october")){
+            student_BirthMonthComplete = "OCTOBER";
+
+        }else if(birth_month.equals("nov") || birth_month.equals("november")){
+            student_BirthMonthComplete = "NOVEMBER";
+
+        }else if(birth_month.equals("dec") || birth_month.equals("december")){
+            student_BirthMonthComplete = "DECEMBER";
+
+        }
+        return student_BornMonth;
+    }
+
+    static String student_BirthDayComplete(){
+        student_AddCompleteBirthDay = student_BirthMonthComplete + " " + birth_day + " " + birth_year;
+        return student_AddCompleteBirthDay;
+    }
+
+    //Months that has 31 days
+    static String Months_31_days_function(Scanner call_scanner){
+        while (true) {
+            System.out.print("Day:");
+            if (call_scanner.hasNextInt()) {
+                birth_day = call_scanner.nextInt();
+                try {
+                    if (birth_day >= 1 && birth_day <= 31) {
+                        Con_birth_year = (int) birth_year;
+                        ConStr_birth_year =  Integer.toString(Con_birth_year);
+                        ConStr_birth_day = Integer.toString(birth_day);
+
+                        //Student Password Generated
+                        coc_account_password = ConStr_birth_year + ConStr_birth_day;
+
+                        return coc_account_password;
+
+                    } else {
+                        System.out.println("Invalid Day Number");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid Day Number");
+                }
+            } else {
+                System.out.println("Invalid Day Number");
+                call_scanner.next();
+            }
+        }
+    }
+
+    //Months that has 30 days function
+    static String Months_30_days_function(Scanner call_scanner) {
+        while (true) {
+            System.out.print("Day:");
+            if (call_scanner.hasNextInt()) {
+                birth_day = call_scanner.nextInt();
+                try {
+                    if (birth_day >= 1 && birth_day <= 30) {
+                        Con_birth_year = (int) birth_year;
+                        ConStr_birth_year =  Integer.toString(Con_birth_year);
+                        ConStr_birth_day = Integer.toString(birth_day);
+
+                        //Student Password Generated
+                        coc_account_password = ConStr_birth_year + ConStr_birth_day;
+
+                        return coc_account_password;
+
+                    } else {
+                        System.out.println("Invalid Day Number");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid Day Number");
+                }
+            } else {
+                System.out.println("Invalid Day Number");
+                call_scanner.next();
+            }
+        }
+    }
+
+    //Month that has 29 days
+    //February Leap Year Function
+    static String february_LeapYear_function(Scanner call_scanner) {
+        while (true) {
+            System.out.print("Day:");
+            if (call_scanner.hasNextInt()) {
+                birth_day = call_scanner.nextInt();
+                try {
+                    if (birth_day >= 1 && birth_day <= 29) {
+                        System.out.println("February");
+                        Con_birth_year = (int) birth_year;
+                        ConStr_birth_year =  Integer.toString(Con_birth_year);
+                        ConStr_birth_day = Integer.toString(birth_day);
+
+                        //Student Password Generated
+                        coc_account_password = ConStr_birth_year + ConStr_birth_day;
+
+                        return coc_account_password;
+
+                    } else {
+                        System.out.println("Invalid Day Number");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid Day Number");
+                }
+            } else {
+                System.out.println("Invalid Day Number");
+                call_scanner.next();
+            }
+        }
+    }
+
+    //Month that has 28 days
+    //February Not Leap Year function
+    static String february_NotLeapYear_function(Scanner call_scanner) {
+        while (true) {
+            System.out.print("Day:");
+            if (call_scanner.hasNextInt()) {
+                birth_day = call_scanner.nextInt();
+                try {
+                    if (birth_day >= 1 && birth_day <= 28) {
+                        Con_birth_year = (int) birth_year;
+
+                        ConStr_birth_year =  Integer.toString(Con_birth_year);
+                        ConStr_birth_day = Integer.toString(birth_day);
+
+                        //Student Password Generated
+                        coc_account_password = ConStr_birth_year + ConStr_birth_day;
+
+                        return coc_account_password;
+
+                    } else {
+                        System.out.println("Invalid Day Number");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid Day Number");
+                }
+            } else {
+                System.out.println("Invalid Day Number");
+                call_scanner.next();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println("LOG-IN CLASSROOM\n");
+        System.out.println("+-----------------+");
+        System.out.println("│LOG-IN AS A:[S/T]│");
+        System.out.println("+-----------------+");
+        System.out.println("│[S] - STUDENT    │");
+        System.out.println("│[T] - TEACHER    │");
+        System.out.println("+-----------------+");
+        System.out.print("LOG-IN AS A [S/T]: ");
+
+        while (true){
+            while (true){
+                String user_choose = call_scanner.next().toLowerCase().trim();
+
+                if (user_choose.equals("s")){
+                    student_login(call_scanner);
+                }else if (user_choose.equals("t")) {
+                    create_teacher_table(call_scanner);
+                }else{
+                    System.out.println("\nInvalid choice. Please enter 'S' for Student or 'T' for Teacher.");
+                    System.out.println("+-----------------+");
+                    System.out.println("│LOG-IN AS A:[S/T]│");
+                    System.out.println("+-----------------+");
+                    System.out.println("│[S] - STUDENT    │");
+                    System.out.println("│[T] - TEACHER    │");
+                    System.out.println("+-----------------+");
+                    System.out.print("LOG-IN AS A [S/T]:");
+                    break;
+                }
+            }
+        }
+    }
+}
